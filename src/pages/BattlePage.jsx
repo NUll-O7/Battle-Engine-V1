@@ -75,7 +75,7 @@ export function BattlePage() {
   return (
     <div className="battle-page">
       <div className="battle-info">
-        <h2>Turn {turnNumber}</h2>
+        <h2>Round {Math.ceil(turnNumber / 2)}</h2>
         {isGameOver ? (
           <div className="game-over">
             <h3>Game Over!</h3>

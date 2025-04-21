@@ -98,13 +98,14 @@ function battleReducer(state, action) {
     
     case 'END_TURN': {
       const nextPlayer = state.currentTurn === 'player1' ? 'player2' : 'player1';
-      const updatedState = {
+      // Only increment turn number when player1's turn ends
+      const newTurnNumber = state.currentTurn === 'player1' ? state.turnNumber + 1 : state.turnNumber;
+      
+      return {
         ...state,
         currentTurn: nextPlayer,
-        turnNumber: state.turnNumber + 1
+        turnNumber: newTurnNumber
       };
-      
-      return checkGameOver(updatedState);
     }
     
     case 'DRAW_CARD': {
