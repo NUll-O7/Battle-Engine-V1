@@ -1,23 +1,13 @@
 import React, { createContext, useContext, useReducer } from 'react';
+import { createRandomCard } from '../utils/cardUtils';
 
-// Sample cards for initial deck
-const sampleCards = [
-  { id: 'card1', name: 'Warrior', attack: 5, defense: 3, cost: 3, description: 'A fierce warrior' },
-  { id: 'card2', name: 'Archer', attack: 4, defense: 2, cost: 2, description: 'A skilled archer' },
-  { id: 'card3', name: 'Mage', attack: 6, defense: 1, cost: 4, description: 'A powerful mage' },
-  { id: 'card4', name: 'Knight', attack: 3, defense: 5, cost: 3, description: 'A noble knight' },
-  { id: 'card5', name: 'Rogue', attack: 4, defense: 2, cost: 2, description: 'A sneaky rogue' },
-  { id: 'card6', name: 'Paladin', attack: 3, defense: 4, cost: 3, description: 'A holy paladin' },
-  { id: 'card7', name: 'Dragon', attack: 7, defense: 5, cost: 6, description: 'A fearsome dragon' },
-  { id: 'card8', name: 'Goblin', attack: 2, defense: 1, cost: 1, description: 'A small goblin' },
-  { id: 'card9', name: 'Elf', attack: 3, defense: 2, cost: 2, description: 'A graceful elf' },
-  { id: 'card10', name: 'Dwarf', attack: 2, defense: 4, cost: 2, description: 'A sturdy dwarf' }
-];
-
-// Create initial decks by shuffling and duplicating sample cards
+// Create initial decks with random cards
 const createInitialDeck = () => {
-  const shuffled = [...sampleCards].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 5); // Start with 5 cards
+  const deck = [];
+  for (let i = 0; i < 5; i++) {
+    deck.push(createRandomCard(`card${i + 1}`));
+  }
+  return deck;
 };
 
 const initialState = {
@@ -115,11 +105,14 @@ function battleReducer(state, action) {
       const newDeck = [...player.deck];
       const [card] = newDeck.splice(0, 1);
       
+      // Generate a new random card to replace the drawn one
+      const newCard = createRandomCard(`card${Date.now()}`);
+      
       const updatedState = {
         ...state,
         [action.playerId]: {
           ...player,
-          deck: newDeck,
+          deck: [...newDeck, newCard],
           hand: [...player.hand, card]
         }
       };
