@@ -1,9 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useBattle } from '../context/BattleContext';
+import DiceRoll from '../components/DiceRoll';
+import { determineDiceRollWinner } from '../utils/battleUtils';
 
 export function BattlePage() {
   const { state, dispatch } = useBattle();
   const { player1, player2, currentTurn, turnNumber, isGameOver, winner } = state;
+  const [diceResults, setDiceResults] = useState({ player: null, ai: null });
+  const [isDiceRolling, setIsDiceRolling] = useState(false);
 
   // Auto-draw cards at the beginning of each turn
   useEffect(() => {
@@ -13,10 +17,12 @@ export function BattlePage() {
   }, [currentTurn, turnNumber, isGameOver, dispatch]);
 
   const handleStartGame = () => {
+    setDiceResults({ player: null, ai: null });
     dispatch({ type: 'START_GAME' });
   };
 
   const handleEndTurn = () => {
+    setDiceResults({ player: null, ai: null });
     dispatch({ type: 'END_TURN' });
   };
 
@@ -28,13 +34,36 @@ export function BattlePage() {
 
   const handleAttack = (attackerId, attackerCardId, defenderId, defenderCardId = null) => {
     if (currentTurn === attackerId && !isGameOver) {
-      dispatch({
-        type: 'ATTACK',
-        attackerId,
-        defenderId,
-        attackerCardId,
-        defenderCardId
-      });
+      setIsDiceRolling(true);
+      // The dice roll winner will be determined in handleDiceRollComplete
+    }
+  };
+
+  const handleDiceRollComplete = (roll) => {
+    if (currentTurn === 'player1') {
+      setDiceResults(prev => ({ ...prev, player: roll }));
+      // Simulate AI roll after a short delay
+      setTimeout(() => {
+        const aiRoll = Math.floor(Math.random() * 6) + 1;
+        setDiceResults(prev => ({ ...prev, ai: aiRoll }));
+        
+        // Determine the winner after both rolls
+        const playerCard = player1.field[0];
+        const aiCard = player2.field[0];
+        const winner = determineDiceRollWinner(roll, aiRoll, playerCard, aiCard);
+        
+        // Apply the attack result
+        dispatch({
+          type: 'ATTACK',
+          attackerId: 'player1',
+          defenderId: 'player2',
+          attackerCardId: playerCard.id,
+          defenderCardId: aiCard.id,
+          diceWinner: winner
+        });
+        
+        setIsDiceRolling(false);
+      }, 1000);
     }
   };
 
@@ -56,6 +85,23 @@ export function BattlePage() {
           <p>Current Turn: {currentTurn === 'player1' ? player1.name : player2.name}</p>
         )}
       </div>
+
+      {/* Dice Roll Section */}
+      {isDiceRolling && (
+        <div className="dice-roll-section">
+          <div className="dice-container">
+            <DiceRoll 
+              onRollComplete={handleDiceRollComplete}
+              isPlayerTurn={isPlayer1Turn}
+            />
+            {diceResults.ai !== null && (
+              <div className="ai-dice-result">
+                AI Roll: {diceResults.ai}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="player-stats">
         <div className={`player player1 ${isPlayer1Turn ? 'active-turn' : ''}`}>

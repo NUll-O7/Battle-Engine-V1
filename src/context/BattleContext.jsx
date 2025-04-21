@@ -127,63 +127,44 @@ function battleReducer(state, action) {
     }
     
     case 'ATTACK': {
-      const { attackerId, defenderId, attackerCardId, defenderCardId } = action;
-      
-      // If attacking player directly (no defender card)
-      if (!defenderCardId) {
-        const attacker = state[attackerId];
-        const defender = state[defenderId];
-        const attackerCard = attacker.field.find(card => card.id === attackerCardId);
-        
-        if (!attackerCard) return state;
-        
-        const newDefenderHealth = defender.health - attackerCard.attack;
-        
-        const updatedState = {
-          ...state,
-          [defenderId]: {
-            ...defender,
-            health: newDefenderHealth
-          }
-        };
-        
-        return checkGameOver(updatedState);
-      }
-      
-      // Card vs card combat
+      const { attackerId, defenderId, attackerCardId, defenderCardId, diceWinner } = action;
       const attacker = state[attackerId];
       const defender = state[defenderId];
+      
       const attackerCard = attacker.field.find(card => card.id === attackerCardId);
       const defenderCard = defender.field.find(card => card.id === defenderCardId);
       
       if (!attackerCard || !defenderCard) return state;
       
-      // Apply damage to both cards
-      const newAttackerField = attacker.field.map(card => 
-        card.id === attackerCardId 
-          ? { ...card, defense: card.defense - defenderCard.attack } 
-          : card
-      ).filter(card => card.defense > 0);
+      // Determine damage based on dice roll winner
+      let damage = 0;
+      if (diceWinner === attackerId) {
+        // Attacker wins dice roll - full damage
+        damage = Math.max(0, attackerCard.attack - defenderCard.defense);
+      } else if (diceWinner === defenderId) {
+        // Defender wins dice roll - half damage
+        damage = Math.max(0, Math.floor((attackerCard.attack - defenderCard.defense) / 2));
+      } else {
+        // Draw - quarter damage
+        damage = Math.max(0, Math.floor((attackerCard.attack - defenderCard.defense) / 4));
+      }
       
-      const newDefenderField = defender.field.map(card => 
-        card.id === defenderCardId 
-          ? { ...card, defense: card.defense - attackerCard.attack } 
-          : card
-      ).filter(card => card.defense > 0);
+      // Apply damage to defender's health
+      const newDefenderHealth = Math.max(0, defender.health - damage);
       
-      const updatedState = {
+      // Check if game is over
+      const isGameOver = newDefenderHealth === 0;
+      const winner = isGameOver ? attackerId : null;
+      
+      return {
         ...state,
-        [attackerId]: {
-          ...attacker,
-          field: newAttackerField
-        },
         [defenderId]: {
           ...defender,
-          field: newDefenderField
-        }
+          health: newDefenderHealth
+        },
+        isGameOver,
+        winner
       };
-      
-      return checkGameOver(updatedState);
     }
     
     default:
