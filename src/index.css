@@ -1,0 +1,273 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Game-specific styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.card-content {
+  backface-visibility: hidden;
+}
+
+.card-shine {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+
+.winner-glow {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+.winner-badge {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: bounce 0.5s ease-in-out;
+}
+
+/* Game background pattern */
+.game-pattern {
+  background-color: #f3f4f6;
+  background-image: radial-gradient(#6d28d9 0.5px, transparent 0.5px);
+  background-size: 15px 15px;
+}
+
+/* Stat bar animations */
+.stat-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+}
+
+/* Animations */
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+  }
+}
+
+@keyframes bounce {
+  0% { transform: translateY(-30px); }
+  50% { transform: translateY(5px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Game UI Elements */
+.game-button {
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+
+.game-button:hover {
+  transform: translateY(-2px);
+}
+
+.game-button:active {
+  transform: translateY(1px);
+}
+
+/* Card title effect */
+.card-title {
+  background: linear-gradient(90deg, #fff, #f0f0f0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Game container background */
+.game-container {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .card-3d {
+    transform: scale(0.9);
+  }
+}
+
+/* Add these styles to your existing CSS */
+
+.battle-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.battle-info {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.game-over {
+  background-color: #ffebee;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.game-over h3 {
+  color: #d32f2f;
+  margin: 0 0 10px 0;
+}
+
+.player-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.player {
+  flex: 1;
+  padding: 15px;
+  margin: 0 10px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  transition: all 0.3s ease;
+}
+
+.player.active-turn {
+  background-color: #e3f2fd;
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
+
+.player h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.player-field, .player-hand {
+  margin-top: 15px;
+}
+
+.cards-container, .field-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.card {
+  width: 120px;
+  height: 160px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card h5 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.card p {
+  margin: 5px 0;
+  font-size: 12px;
+}
+
+.card.on-field {
+  background-color: #e8f5e9;
+}
+
+.card.face-down {
+  background-color: #bdbdbd;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #9e9e9e, #757575);
+  border-radius: 8px;
+}
+
+.battle-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.start-game-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.start-game-btn:hover {
+  background-color: #388e3c;
+}
+
+.end-turn-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.end-turn-btn:hover {
+  background-color: #1976d2;
+}

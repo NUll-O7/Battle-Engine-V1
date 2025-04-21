@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Fire Dragon",
+    "img": "https://images.pexels.com/photos/6442548/pexels-photo-6442548.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 10,
+    "speed": 8,
+    "magic": 7
+  },
+  {
+    "id": 2,
+    "name": "Ice Golem",
+    "img": "https://images.pexels.com/photos/8217302/pexels-photo-8217302.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 9,
+    "speed": 4,
+    "magic": 6
+  },
+  {
+    "id": 3,
+    "name": "Shadow Beast",
+    "img": "https://images.pexels.com/photos/8107007/pexels-photo-8107007.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 8,
+    "speed": 9,
+    "magic": 5
+  },
+  {
+    "id": 4,
+    "name": "Ancient Wyvern",
+    "img": "https://images.pexels.com/photos/4612113/pexels-photo-4612113.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 9,
+    "speed": 7,
+    "magic": 6
+  },
+  {
+    "id": 5,
+    "name": "Swamp Troll",
+    "img": "https://images.pexels.com/photos/5089152/pexels-photo-5089152.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 8,
+    "speed": 3,
+    "magic": 4
+  },
+  {
+    "id": 6,
+    "name": "Forest Wraith",
+    "img": "https://images.pexels.com/photos/9599320/pexels-photo-9599320.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 6,
+    "speed": 8,
+    "magic": 9
+  },
+  {
+    "id": 7,
+    "name": "Stone Cyclops",
+    "img": "https://images.pexels.com/photos/6942349/pexels-photo-6942349.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 10,
+    "speed": 2,
+    "magic": 3
+  },
+  {
+    "id": 8,
+    "name": "Mist Phantom",
+    "img": "https://images.pexels.com/photos/5699646/pexels-photo-5699646.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 4,
+    "speed": 10,
+    "magic": 8
+  },
+  {
+    "id": 9,
+    "name": "Thunder Serpent",
+    "img": "https://images.pexels.com/photos/5088179/pexels-photo-5088179.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 7,
+    "speed": 9,
+    "magic": 6
+  },
+  {
+    "id": 10,
+    "name": "Void Demon",
+    "img": "https://images.pexels.com/photos/4016625/pexels-photo-4016625.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 8,
+    "speed": 7,
+    "magic": 10
+  }
+]
