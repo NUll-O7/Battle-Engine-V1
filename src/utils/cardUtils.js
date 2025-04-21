@@ -2,6 +2,20 @@
 const cardNamePrefixes = ['Mighty', 'Swift', 'Brave', 'Dark', 'Mystic', 'Royal', 'Shadow', 'Divine', 'Ancient', 'Fierce'];
 const cardNameTypes = ['Warrior', 'Mage', 'Knight', 'Archer', 'Dragon', 'Beast', 'Spirit', 'Guardian', 'Wizard', 'Rogue'];
 
+// Card image mappings
+const cardImages = {
+  Warrior: '/images/cards/warrior.png',
+  Mage: '/images/cards/mage.png',
+  Knight: '/images/cards/knight.png',
+  Archer: '/images/cards/archer.png',
+  Dragon: '/images/cards/dragon.png',
+  Beast: '/images/cards/beast.png',
+  Spirit: '/images/cards/spirit.png',
+  Guardian: '/images/cards/guardian.png',
+  Wizard: '/images/cards/wizard.png',
+  Rogue: '/images/cards/rogue.png'
+};
+
 // Card description templates
 const cardDescriptions = [
   'A powerful fighter with unmatched strength',
@@ -32,11 +46,15 @@ export const generateRandomStats = () => {
   };
 };
 
-// Generate a random card name
+// Generate a random card name and get its image
 export const generateRandomCardName = () => {
   const prefix = cardNamePrefixes[Math.floor(Math.random() * cardNamePrefixes.length)];
   const type = cardNameTypes[Math.floor(Math.random() * cardNameTypes.length)];
-  return `${prefix} ${type}`;
+  return {
+    name: `${prefix} ${type}`,
+    type,
+    imageUrl: cardImages[type]
+  };
 };
 
 // Generate a random card description
@@ -47,9 +65,11 @@ export const generateRandomDescription = () => {
 // Create a complete random card
 export const createRandomCard = (id) => {
   const stats = generateRandomStats();
+  const { name, imageUrl } = generateRandomCardName();
   return {
     id,
-    name: generateRandomCardName(),
+    name,
+    imageUrl,
     description: generateRandomDescription(),
     ...stats
   };

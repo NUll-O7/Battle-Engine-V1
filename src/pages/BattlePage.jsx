@@ -4,6 +4,28 @@ import DiceRoll from '../components/DiceRoll';
 import { determineDiceRollWinner } from '../utils/battleUtils';
 import '../styles/BattlePage.css';
 
+// Update the card rendering in both player fields and hands
+const renderCard = (card, onClick, isFaceDown = false) => (
+  <div 
+    key={card.id} 
+    className={`card ${isFaceDown ? 'face-down' : ''}`}
+    onClick={onClick}
+  >
+    {!isFaceDown && (
+      <>
+        <div className="card-image">
+          <img src={card.imageUrl} alt={card.name} />
+        </div>
+        <h5>{card.name}</h5>
+        <p>ATK: {card.attack} | DEF: {card.defense}</p>
+        <p>Cost: {card.cost}</p>
+        <p>{card.description}</p>
+      </>
+    )}
+    {isFaceDown && <div className="card-back" />}
+  </div>
+);
+
 export function BattlePage() {
   const { state, dispatch } = useBattle();
   const { player1, player2, currentTurn, turnNumber, isGameOver, winner } = state;
@@ -117,17 +139,10 @@ export function BattlePage() {
           <div className="player-field">
             <h4>Your Field</h4>
             <div className="field-container">
-              {player1.field.map((card) => (
-                <div 
-                  key={card.id} 
-                  className="card on-field"
-                  onClick={() => isPlayer1Turn && player2.field.length > 0 && 
-                    handleAttack('player1', card.id, 'player2', player2.field[0].id)}
-                >
-                  <h5>{card.name}</h5>
-                  <p>ATK: {card.attack} | DEF: {card.defense}</p>
-                  <p>{card.description}</p>
-                </div>
+              {player1.field.map((card) => renderCard(
+                card,
+                () => isPlayer1Turn && player2.field.length > 0 && 
+                  handleAttack('player1', card.id, 'player2', player2.field[0].id)
               ))}
             </div>
           </div>
@@ -137,17 +152,9 @@ export function BattlePage() {
             <div className="player-hand">
               <h4>Your Hand</h4>
               <div className="cards-container">
-                {player1.hand.map((card) => (
-                  <div 
-                    key={card.id} 
-                    className="card"
-                    onClick={() => handlePlayCard('player1', card.id, player1.field.length)}
-                  >
-                    <h5>{card.name}</h5>
-                    <p>ATK: {card.attack} | DEF: {card.defense}</p>
-                    <p>Cost: {card.cost}</p>
-                    <p>{card.description}</p>
-                  </div>
+                {player1.hand.map((card) => renderCard(
+                  card,
+                  () => handlePlayCard('player1', card.id, player1.field.length)
                 ))}
               </div>
             </div>
@@ -166,17 +173,10 @@ export function BattlePage() {
           <div className="player-field">
             <h4>Opponent's Field</h4>
             <div className="field-container">
-              {player2.field.map((card) => (
-                <div 
-                  key={card.id} 
-                  className="card on-field"
-                  onClick={() => isPlayer1Turn && player1.field.length > 0 && 
-                    handleAttack('player1', player1.field[0].id, 'player2', card.id)}
-                >
-                  <h5>{card.name}</h5>
-                  <p>ATK: {card.attack} | DEF: {card.defense}</p>
-                  <p>{card.description}</p>
-                </div>
+              {player2.field.map((card) => renderCard(
+                card,
+                () => isPlayer1Turn && player1.field.length > 0 && 
+                  handleAttack('player1', player1.field[0].id, 'player2', card.id)
               ))}
             </div>
           </div>
@@ -186,11 +186,7 @@ export function BattlePage() {
             <div className="player-hand">
               <h4>Opponent's Hand</h4>
               <div className="cards-container">
-                {player2.hand.map((card) => (
-                  <div key={card.id} className="card face-down">
-                    <div className="card-back" />
-                  </div>
-                ))}
+                {player2.hand.map((card) => renderCard(card, null, true))}
               </div>
             </div>
           )}
