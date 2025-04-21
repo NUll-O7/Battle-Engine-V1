@@ -129,7 +129,7 @@ const About = () => {
                 Icons by <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">Lucide</a>.
               </p>
               <p className="text-gray-600">
-                Created by [Your Name] with React, TypeScript, and Framer Motion.
+                Created by Dhruv Soni with React, JavaScript, and Framer Motion.
               </p>
             </div>
           </div>
