@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Bengal Tiger",
+    "img": "https://images.pexels.com/photos/145939/pexels-photo-145939.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 9,
+    "speed": 8,
+    "magic": 2
+  },
+  {
+    "id": 2,
+    "name": "Black Panther",
+    "img": "https://images.pexels.com/photos/3690511/pexels-photo-3690511.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 8,
+    "speed": 10,
+    "magic": 3
+  },
+  {
+    "id": 3,
+    "name": "Great White Shark",
+    "img": "https://images.pexels.com/photos/8817894/pexels-photo-8817894.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 10,
+    "speed": 7,
+    "magic": 1
+  },
+  {
+    "id": 4,
+    "name": "Golden Eagle",
+    "img": "https://images.pexels.com/photos/42313/eagle-bald-eagle-alaskan-majestic-42313.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 6,
+    "speed": 9,
+    "magic": 4
+  },
+  {
+    "id": 5,
+    "name": "Silverback Gorilla",
+    "img": "https://images.pexels.com/photos/12920270/pexels-photo-12920270.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 10,
+    "speed": 5,
+    "magic": 3
+  },
+  {
+    "id": 6,
+    "name": "Komodo Dragon",
+    "img": "https://images.pexels.com/photos/6519482/pexels-photo-6519482.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 7,
+    "speed": 6,
+    "magic": 5
+  },
+  {
+    "id": 7,
+    "name": "Cheetah",
+    "img": "https://images.pexels.com/photos/1319515/pexels-photo-1319515.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 6,
+    "speed": 10,
+    "magic": 2
+  },
+  {
+    "id": 8,
+    "name": "African Elephant",
+    "img": "https://images.pexels.com/photos/1532693/pexels-photo-1532693.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 10,
+    "speed": 4,
+    "magic": 2
+  },
+  {
+    "id": 9,
+    "name": "Grey Wolf",
+    "img": "https://images.pexels.com/photos/686094/pexels-photo-686094.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 7,
+    "speed": 8,
+    "magic": 4
+  },
+  {
+    "id": 10,
+    "name": "Saltwater Crocodile",
+    "img": "https://images.pexels.com/photos/12568804/pexels-photo-12568804.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "strength": 9,
+    "speed": 5,
+    "magic": 2
+  }
+]
