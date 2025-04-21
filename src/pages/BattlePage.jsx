@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useBattle } from '../context/BattleContext';
 import DiceRoll from '../components/DiceRoll';
 import { determineDiceRollWinner } from '../utils/battleUtils';
+import '../styles/BattlePage.css';
 
 export function BattlePage() {
   const { state, dispatch } = useBattle();

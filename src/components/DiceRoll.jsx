@@ -41,15 +41,17 @@ const DiceRoll = ({ onRollComplete, isPlayerTurn }) => {
   }, [isPlayerTurn]);
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="dice-roll-component">
       <div 
         ref={diceRef}
-        className="w-16 h-16 bg-white rounded-lg shadow-lg flex items-center justify-center text-2xl font-bold cursor-pointer transform-gpu"
+        className={`dice ${isRolling ? 'rolling' : ''}`}
         onClick={!isRolling ? rollDice : undefined}
       >
-        {result || '?'}
+        <div className="dice-face">
+          {result || '?'}
+        </div>
       </div>
-      <div className="text-sm text-gray-600">
+      <div className="dice-status">
         {isRolling ? 'Rolling...' : isPlayerTurn ? 'Your turn to roll!' : 'Waiting for AI...'}
       </div>
     </div>
