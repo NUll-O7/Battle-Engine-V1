@@ -95,6 +95,13 @@
   }
 }
 
+.battle-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  color: white;
+  padding: 2rem;
+}
+
 .card {
   position: relative;
   width: 200px;
@@ -104,15 +111,17 @@
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .card-image {
@@ -148,6 +157,7 @@
 
 .card.face-down {
   background: linear-gradient(45deg, #2c3e50, #3498db);
+  border: 2px solid #34495e;
 }
 
 .card-back {
@@ -155,10 +165,93 @@
   height: 100%;
   background: repeating-linear-gradient(
     45deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0.1) 10px,
-    transparent 10px,
-    transparent 20px
+    #2c3e50,
+    #2c3e50 10px,
+    #34495e 10px,
+    #34495e 20px
   );
   border-radius: 5px;
+}
+
+.player-hand {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.cards-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.field-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  padding: 1rem;
+  min-height: 150px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.player-info {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.active-turn {
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.game-over {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+  margin: 2rem 0;
+}
+
+.start-game-btn, .end-turn-btn {
+  background: linear-gradient(45deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.start-game-btn:hover, .end-turn-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.start-game-btn:disabled, .end-turn-btn:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes cardPlay {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.2) translateY(-20px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.card-playing {
+  animation: cardPlay 0.5s ease-out;
 } 

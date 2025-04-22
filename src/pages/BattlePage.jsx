@@ -1,211 +1,110 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBattle } from '../context/BattleContext';
-import DiceRoll from '../components/DiceRoll';
-import { determineDiceRollWinner } from '../utils/battleUtils';
+import CardAnimation from '../components/CardAnimation';
+import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/BattlePage.css';
 
-// Update the card rendering in both player fields and hands
-const renderCard = (card, onClick, isFaceDown = false) => (
-  <div 
-    key={card.id} 
-    className={`card ${isFaceDown ? 'face-down' : ''}`}
-    onClick={onClick}
-  >
-    {!isFaceDown && (
-      <>
-        <div className="card-image">
-          <img src={card.imageUrl} alt={card.name} />
-        </div>
-        <h5>{card.name}</h5>
-        <p>ATK: {card.attack} | DEF: {card.defense}</p>
-        <p>Cost: {card.cost}</p>
-        <p>{card.description}</p>
-      </>
-    )}
-    {isFaceDown && <div className="card-back" />}
-  </div>
-);
-
-export function BattlePage() {
+const BattlePage = () => {
   const { state, dispatch } = useBattle();
-  const { player1, player2, currentTurn, turnNumber, isGameOver, winner } = state;
-  const [diceResults, setDiceResults] = useState({ player: null, ai: null });
-  const [isDiceRolling, setIsDiceRolling] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [lastPlayedPosition, setLastPlayedPosition] = useState({ x: 0, y: 0 });
 
-  // Auto-draw cards at the beginning of each turn
   useEffect(() => {
-    if (turnNumber > 0 && !isGameOver) {
-      dispatch({ type: 'DRAW_CARD', playerId: currentTurn });
-    }
-  }, [currentTurn, turnNumber, isGameOver, dispatch]);
-
-  const handleStartGame = () => {
-    setDiceResults({ player: null, ai: null });
     dispatch({ type: 'START_GAME' });
+  }, [dispatch]);
+
+  const handleCardClick = (card) => {
+    if (state.currentTurn === 'player1' && state.player1.hand.includes(card)) {
+      if (!state.lastPlayedCard || 
+          card.attack === state.lastPlayedCard.attack || 
+          card.defense === state.lastPlayedCard.defense) {
+        setSelectedCard(card);
+        setLastPlayedPosition({ x: window.innerWidth / 2 - 64, y: window.innerHeight / 2 - 96 });
+        dispatch({ type: 'PLAY_CARD', playerId: 'player1', cardId: card.id });
+      }
+    }
   };
 
   const handleEndTurn = () => {
-    setDiceResults({ player: null, ai: null });
     dispatch({ type: 'END_TURN' });
   };
 
-  const handlePlayCard = (playerId, cardId, position) => {
-    if (currentTurn === playerId && !isGameOver) {
-      dispatch({ type: 'PLAY_CARD', playerId, cardId, position });
-    }
-  };
+  const renderPlayerHand = (player, isCurrentPlayer) => {
+    const hand = player.hand;
+    const startX = (window.innerWidth - (hand.length * 40)) / 2;
+    const y = isCurrentPlayer ? window.innerHeight - 200 : 50;
 
-  const handleAttack = (attackerId, attackerCardId, defenderId, defenderCardId = null) => {
-    if (currentTurn === attackerId && !isGameOver) {
-      setIsDiceRolling(true);
-      // The dice roll winner will be determined in handleDiceRollComplete
-    }
+    return (
+      <div className="relative w-full h-48">
+        {hand.map((card, index) => (
+          <CardAnimation
+            key={card.id}
+            card={card}
+            isPlaying={selectedCard?.id === card.id}
+            position={{
+              x: startX + (index * 40),
+              y: y
+            }}
+            onClick={() => isCurrentPlayer && handleCardClick(card)}
+          />
+        ))}
+      </div>
+    );
   };
-
-  const handleDiceRollComplete = (roll) => {
-    if (currentTurn === 'player1') {
-      setDiceResults(prev => ({ ...prev, player: roll }));
-      // Simulate AI roll after a short delay
-      setTimeout(() => {
-        const aiRoll = Math.floor(Math.random() * 6) + 1;
-        setDiceResults(prev => ({ ...prev, ai: aiRoll }));
-        
-        // Determine the winner after both rolls
-        const playerCard = player1.field[0];
-        const aiCard = player2.field[0];
-        const winner = determineDiceRollWinner(roll, aiRoll, playerCard, aiCard);
-        
-        // Apply the attack result
-        dispatch({
-          type: 'ATTACK',
-          attackerId: 'player1',
-          defenderId: 'player2',
-          attackerCardId: playerCard.id,
-          defenderCardId: aiCard.id,
-          diceWinner: winner
-        });
-        
-        setIsDiceRolling(false);
-      }, 1000);
-    }
-  };
-
-  // Determine if it's the current player's turn
-  const isPlayer1Turn = currentTurn === 'player1';
-  const isPlayer2Turn = currentTurn === 'player2';
 
   return (
-    <div className="battle-page">
-      <div className="battle-info">
-        <h2>Round {Math.ceil(turnNumber / 2)}</h2>
-        {isGameOver ? (
-          <div className="game-over">
-            <h3>Game Over!</h3>
-            <p>Winner: {winner === 'player1' ? player1.name : player2.name}</p>
-            <button onClick={handleStartGame} className="start-game-btn">Play Again</button>
-          </div>
-        ) : (
-          <p>Current Turn: {currentTurn === 'player1' ? player1.name : player2.name}</p>
-        )}
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Player 2 (AI) */}
+        <div className="mb-8">
+          <div className="text-white text-xl mb-4">AI Player</div>
+          {renderPlayerHand(state.player2, false)}
+        </div>
 
-      {/* Dice Roll Section */}
-      {isDiceRolling && (
-        <div className="dice-roll-section">
-          <div className="dice-container">
-            <DiceRoll 
-              onRollComplete={handleDiceRollComplete}
-              isPlayerTurn={isPlayer1Turn}
-            />
-            {diceResults.ai !== null && (
-              <div className="ai-dice-result">
-                AI Roll: {diceResults.ai}
-              </div>
+        {/* Game Board */}
+        <div className="relative h-96 mb-8 bg-gray-800 rounded-lg shadow-xl">
+          <AnimatePresence>
+            {state.lastPlayedCard && (
+              <CardAnimation
+                card={state.lastPlayedCard}
+                isPlaying={true}
+                position={lastPlayedPosition}
+              />
             )}
-          </div>
-        </div>
-      )}
-
-      <div className="player-stats">
-        <div className={`player player1 ${isPlayer1Turn ? 'active-turn' : ''}`}>
-          <h3>{player1.name}</h3>
-          <div className="player-info">
-            <p>Health: {player1.health}</p>
-            <p>Cards in Hand: {player1.hand.length}</p>
-            <p>Cards in Deck: {player1.deck.length}</p>
-          </div>
-          
-          {/* Player 1's field */}
-          <div className="player-field">
-            <h4>Your Field</h4>
-            <div className="field-container">
-              {player1.field.map((card) => renderCard(
-                card,
-                () => isPlayer1Turn && player2.field.length > 0 && 
-                  handleAttack('player1', card.id, 'player2', player2.field[0].id)
-              ))}
-            </div>
-          </div>
-          
-          {/* Player 1's hand */}
-          {isPlayer1Turn && !isGameOver && (
-            <div className="player-hand">
-              <h4>Your Hand</h4>
-              <div className="cards-container">
-                {player1.hand.map((card) => renderCard(
-                  card,
-                  () => handlePlayCard('player1', card.id, player1.field.length)
-                ))}
-              </div>
-            </div>
-          )}
+          </AnimatePresence>
         </div>
 
-        <div className={`player player2 ${isPlayer2Turn ? 'active-turn' : ''}`}>
-          <h3>{player2.name}</h3>
-          <div className="player-info">
-            <p>Health: {player2.health}</p>
-            <p>Cards in Hand: {player2.hand.length}</p>
-            <p>Cards in Deck: {player2.deck.length}</p>
-          </div>
-          
-          {/* Player 2's field */}
-          <div className="player-field">
-            <h4>Opponent's Field</h4>
-            <div className="field-container">
-              {player2.field.map((card) => renderCard(
-                card,
-                () => isPlayer1Turn && player1.field.length > 0 && 
-                  handleAttack('player1', player1.field[0].id, 'player2', card.id)
-              ))}
-            </div>
-          </div>
-          
-          {/* Player 2's hand (face down) */}
-          {isPlayer2Turn && !isGameOver && (
-            <div className="player-hand">
-              <h4>Opponent's Hand</h4>
-              <div className="cards-container">
-                {player2.hand.map((card) => renderCard(card, null, true))}
-              </div>
-            </div>
-          )}
+        {/* Player 1 */}
+        <div>
+          <div className="text-white text-xl mb-4">Your Turn</div>
+          {renderPlayerHand(state.player1, true)}
         </div>
-      </div>
 
-      <div className="battle-controls">
-        {turnNumber === 0 ? (
-          <button className="start-game-btn" onClick={handleStartGame}>Start Game</button>
-        ) : !isGameOver ? (
-          <button 
-            className="end-turn-btn" 
+        {/* Game Controls */}
+        <div className="mt-8 flex justify-center">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-lg"
             onClick={handleEndTurn}
-            disabled={isGameOver}
           >
             End Turn
-          </button>
-        ) : null}
+          </motion.button>
+        </div>
+
+        {/* Game Status */}
+        <div className="mt-4 text-center text-white">
+          {state.isGameOver ? (
+            <div className="text-2xl font-bold">
+              {state.winner === 'player1' ? 'You Win!' : 'AI Wins!'}
+            </div>
+          ) : (
+            <div>Turn {state.turnNumber}</div>
+          )}
+        </div>
       </div>
     </div>
   );
-} 
+};
+
+export default BattlePage; 
