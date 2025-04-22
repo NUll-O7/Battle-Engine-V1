@@ -1,76 +1,51 @@
-// Card name templates for random generation
-const cardNamePrefixes = ['Mighty', 'Swift', 'Brave', 'Dark', 'Mystic', 'Royal', 'Shadow', 'Divine', 'Ancient', 'Fierce'];
-const cardNameTypes = ['Warrior', 'Mage', 'Knight', 'Archer', 'Dragon', 'Beast', 'Spirit', 'Guardian', 'Wizard', 'Rogue'];
-
-// Card image mappings
-const cardImages = {
-  Warrior: '/images/cards/warrior.png',
-  Mage: '/images/cards/mage.png',
-  Knight: '/images/cards/knight.png',
-  Archer: '/images/cards/archer.png',
-  Dragon: '/images/cards/dragon.png',
-  Beast: '/images/cards/beast.png',
-  Spirit: '/images/cards/spirit.png',
-  Guardian: '/images/cards/guardian.png',
-  Wizard: '/images/cards/wizard.png',
-  Rogue: '/images/cards/rogue.png'
-};
-
-// Card description templates
-const cardDescriptions = [
-  'A powerful fighter with unmatched strength',
-  'Masters the arcane arts with precision',
-  'Swift and deadly in combat',
-  'Commands the forces of nature',
-  'Ancient knowledge flows through their veins',
-  'Born from the shadows, strikes from darkness',
-  'Blessed by divine powers',
-  'A legendary warrior of old',
-  'Mystical energies surround this creature',
-  'Tactical genius in battle'
+// Card templates for UNO-style gameplay
+const cardTypes = [
+  { attack: 1, defense: 1 },
+  { attack: 2, defense: 2 },
+  { attack: 3, defense: 3 },
+  { attack: 4, defense: 4 },
+  { attack: 5, defense: 5 }
 ];
 
-// Generate random stats within balanced ranges
-export const generateRandomStats = () => {
-  // Base stats range from 1 to 5
-  const baseAttack = Math.floor(Math.random() * 5) + 1;
-  const baseDefense = Math.floor(Math.random() * 5) + 1;
-  
-  // Cost is based on total stats (attack + defense)
-  const cost = Math.ceil((baseAttack + baseDefense) / 2);
-  
-  return {
-    attack: baseAttack,
-    defense: baseDefense,
-    cost: cost
-  };
-};
+// Card name templates
+const cardNameTemplates = [
+  "Red Warrior",
+  "Blue Mage",
+  "Green Knight",
+  "Yellow Archer",
+  "Black Dragon"
+];
 
-// Generate a random card name and get its image
-export const generateRandomCardName = () => {
-  const prefix = cardNamePrefixes[Math.floor(Math.random() * cardNamePrefixes.length)];
-  const type = cardNameTypes[Math.floor(Math.random() * cardNameTypes.length)];
-  return {
-    name: `${prefix} ${type}`,
-    type,
-    imageUrl: cardImages[type]
-  };
-};
+// Card description templates
+const cardDescriptionTemplates = [
+  "A fierce warrior with balanced stats",
+  "A powerful mage with equal attack and defense",
+  "A noble knight with matching strength",
+  "A skilled archer with balanced abilities",
+  "A mighty dragon with equal power"
+];
 
-// Generate a random card description
-export const generateRandomDescription = () => {
-  return cardDescriptions[Math.floor(Math.random() * cardDescriptions.length)];
-};
+// Card image mappings (using placeholder URLs for now)
+const cardImageMappings = [
+  "/images/cards/red-warrior.jpg",
+  "/images/cards/blue-mage.jpg",
+  "/images/cards/green-knight.jpg",
+  "/images/cards/yellow-archer.jpg",
+  "/images/cards/black-dragon.jpg"
+];
 
 // Create a complete random card
-export const createRandomCard = (id) => {
-  const stats = generateRandomStats();
-  const { name, imageUrl } = generateRandomCardName();
+export const createRandomCard = () => {
+  const templateIndex = Math.floor(Math.random() * cardTypes.length);
+  const stats = cardTypes[templateIndex];
+  
   return {
-    id,
-    name,
-    imageUrl,
-    description: generateRandomDescription(),
-    ...stats
+    id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    name: cardNameTemplates[templateIndex],
+    attack: stats.attack,
+    defense: stats.defense,
+    cost: Math.ceil((stats.attack + stats.defense) / 2),
+    imageUrl: cardImageMappings[templateIndex],
+    description: cardDescriptionTemplates[templateIndex]
   };
 }; 

@@ -4,8 +4,9 @@ import { createRandomCard } from '../utils/cardUtils';
 // Create initial decks with random cards
 const createInitialDeck = () => {
   const deck = [];
-  for (let i = 0; i < 5; i++) {
-    deck.push(createRandomCard(`card${i + 1}`));
+  for (let i = 0; i < 30; i++) {
+    const cardId = `card-${Date.now()}-${i}`;
+    deck.push(createRandomCard(cardId));
   }
   return deck;
 };
@@ -15,7 +16,7 @@ const initialState = {
     id: 'player1',
     name: 'Player 1',
     health: 20,
-    deck: createInitialDeck(),
+    deck: [],
     hand: [],
     field: []
   },
@@ -23,14 +24,15 @@ const initialState = {
     id: 'player2',
     name: 'Player 2',
     health: 20,
-    deck: createInitialDeck(),
+    deck: [],
     hand: [],
     field: []
   },
   currentTurn: 'player1',
   turnNumber: 0,
   isGameOver: false,
-  winner: null
+  winner: null,
+  lastPlayedCard: null
 };
 
 /**
@@ -40,7 +42,11 @@ const initialState = {
  */
 function battleReducer(state, action) {
   switch (action.type) {
-    case 'START_GAME':
+    case 'START_GAME': {
+      // Create initial decks for both players
+      const player1Deck = Array.from({ length: 7 }, () => createRandomCard());
+      const player2Deck = Array.from({ length: 7 }, () => createRandomCard());
+      
       return {
         ...state,
         turnNumber: 1,
@@ -49,18 +55,20 @@ function battleReducer(state, action) {
         player1: {
           ...state.player1,
           health: 20,
-          deck: createInitialDeck(),
-          hand: [],
+          deck: [],
+          hand: player1Deck,
           field: []
         },
         player2: {
           ...state.player2,
           health: 20,
-          deck: createInitialDeck(),
-          hand: [],
+          deck: [],
+          hand: player2Deck,
           field: []
-        }
+        },
+        lastPlayedCard: null
       };
+    }
     
     case 'PLAY_CARD': {
       const player = state[action.playerId];
@@ -70,8 +78,13 @@ function battleReducer(state, action) {
       
       const newHand = [...player.hand];
       const [card] = newHand.splice(cardIndex, 1);
-      const newField = [...player.field];
-      newField.splice(action.position, 0, card);
+      
+      // Check if the card can be played (UNO rules)
+      if (state.lastPlayedCard && 
+          card.attack !== state.lastPlayedCard.attack && 
+          card.defense !== state.lastPlayedCard.defense) {
+        return state;
+      }
       
       // Check for game over after playing a card
       const updatedState = {
@@ -79,16 +92,25 @@ function battleReducer(state, action) {
         [action.playerId]: {
           ...player,
           hand: newHand,
-          field: newField
-        }
+          field: [...player.field, card]
+        },
+        lastPlayedCard: card
       };
+      
+      // If player has no cards left, they win
+      if (newHand.length === 0) {
+        return {
+          ...updatedState,
+          isGameOver: true,
+          winner: action.playerId
+        };
+      }
       
       return checkGameOver(updatedState);
     }
     
     case 'END_TURN': {
       const nextPlayer = state.currentTurn === 'player1' ? 'player2' : 'player1';
-      // Only increment turn number when player1's turn ends
       const newTurnNumber = state.currentTurn === 'player1' ? state.turnNumber + 1 : state.turnNumber;
       
       return {
@@ -102,22 +124,18 @@ function battleReducer(state, action) {
       const player = state[action.playerId];
       if (player.deck.length === 0) return state;
       
-      const newDeck = [...player.deck];
-      const [card] = newDeck.splice(0, 1);
+      const newCard = createRandomCard(`card-${Date.now()}`);
+      const updatedDeck = [...player.deck.slice(1)];
+      const updatedHand = [...player.hand, newCard];
       
-      // Generate a new random card to replace the drawn one
-      const newCard = createRandomCard(`card${Date.now()}`);
-      
-      const updatedState = {
+      return {
         ...state,
         [action.playerId]: {
           ...player,
-          deck: [...newDeck, newCard],
-          hand: [...player.hand, card]
+          deck: updatedDeck,
+          hand: updatedHand
         }
       };
-      
-      return checkGameOver(updatedState);
     }
     
     case 'ATTACK': {
