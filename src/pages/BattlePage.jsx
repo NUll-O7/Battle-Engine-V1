@@ -10,8 +10,10 @@ const BattlePage = () => {
   const [lastPlayedPosition, setLastPlayedPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    dispatch({ type: 'START_GAME' });
-  }, [dispatch]);
+    if (!state.isGameStarted) {
+      dispatch({ type: 'START_GAME' });
+    }
+  }, [dispatch, state.isGameStarted]);
 
   const handleCardClick = (card) => {
     if (state.currentTurn === 'player1' && state.player1.hand.includes(card)) {
@@ -51,6 +53,21 @@ const BattlePage = () => {
       </div>
     );
   };
+
+  if (!state.isGameStarted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8 flex items-center justify-center">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-blue-500 text-white px-8 py-4 rounded-lg shadow-lg text-xl"
+          onClick={() => dispatch({ type: 'START_GAME' })}
+        >
+          Start Game
+        </motion.button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8">

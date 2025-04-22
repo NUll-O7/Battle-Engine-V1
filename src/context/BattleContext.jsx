@@ -32,7 +32,8 @@ const initialState = {
   turnNumber: 0,
   isGameOver: false,
   winner: null,
-  lastPlayedCard: null
+  lastPlayedCard: null,
+  isGameStarted: false
 };
 
 /**
@@ -43,27 +44,28 @@ const initialState = {
 function battleReducer(state, action) {
   switch (action.type) {
     case 'START_GAME': {
-      // Create initial decks for both players
-      const player1Deck = Array.from({ length: 7 }, () => createRandomCard());
-      const player2Deck = Array.from({ length: 7 }, () => createRandomCard());
+      // Create initial hands with 7 cards each
+      const player1Hand = Array.from({ length: 7 }, () => createRandomCard());
+      const player2Hand = Array.from({ length: 7 }, () => createRandomCard());
       
       return {
         ...state,
         turnNumber: 1,
         isGameOver: false,
         winner: null,
+        isGameStarted: true,
         player1: {
           ...state.player1,
           health: 20,
           deck: [],
-          hand: player1Deck,
+          hand: player1Hand,
           field: []
         },
         player2: {
           ...state.player2,
           health: 20,
           deck: [],
-          hand: player2Deck,
+          hand: player2Hand,
           field: []
         },
         lastPlayedCard: null
