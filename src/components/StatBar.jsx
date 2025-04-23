@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import anime from 'animejs';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { getStatColor, getStatIcon } from '../utils/gameUtils';
 
 const StatBar = ({
@@ -8,21 +8,9 @@ const StatBar = ({
   highlighted = false,
   showIcon = true,
 }) => {
-  const barRef = useRef(null);
   const statColor = getStatColor(value);
   const maxValue = 10; // Maximum possible stat value
   
-  useEffect(() => {
-    if (barRef.current) {
-      anime({
-        targets: barRef.current,
-        width: `${(value / maxValue) * 100}%`,
-        duration: 1000,
-        easing: 'easeOutElastic(1, .5)',
-      });
-    }
-  }, [value]);
-
   return (
     <div className={`mb-2 ${highlighted ? 'bg-primary-100 p-2 rounded-md' : ''}`}>
       <div className="flex justify-between items-center mb-1">
@@ -35,10 +23,11 @@ const StatBar = ({
         <span className="text-sm font-bold">{value}/10</span>
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          ref={barRef}
+        <motion.div
           className={`h-full ${statColor}`}
-          style={{ width: '0%' }}
+          initial={{ width: 0 }}
+          animate={{ width: `${(value / maxValue) * 100}%` }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         />
       </div>
     </div>

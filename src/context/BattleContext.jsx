@@ -1,14 +1,23 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { createRandomCard } from '../utils/cardUtils';
 
-// Create initial decks with random cards
+// Sample cards for initial deck
+const sampleCards = [
+  { id: 'card1', name: 'Warrior', attack: 5, defense: 3, cost: 3, description: 'A fierce warrior' },
+  { id: 'card2', name: 'Archer', attack: 4, defense: 2, cost: 2, description: 'A skilled archer' },
+  { id: 'card3', name: 'Mage', attack: 6, defense: 1, cost: 4, description: 'A powerful mage' },
+  { id: 'card4', name: 'Knight', attack: 3, defense: 5, cost: 3, description: 'A noble knight' },
+  { id: 'card5', name: 'Rogue', attack: 4, defense: 2, cost: 2, description: 'A sneaky rogue' },
+  { id: 'card6', name: 'Paladin', attack: 3, defense: 4, cost: 3, description: 'A holy paladin' },
+  { id: 'card7', name: 'Dragon', attack: 7, defense: 5, cost: 6, description: 'A fearsome dragon' },
+  { id: 'card8', name: 'Goblin', attack: 2, defense: 1, cost: 1, description: 'A small goblin' },
+  { id: 'card9', name: 'Elf', attack: 3, defense: 2, cost: 2, description: 'A graceful elf' },
+  { id: 'card10', name: 'Dwarf', attack: 2, defense: 4, cost: 2, description: 'A sturdy dwarf' }
+];
+
+// Create initial decks by shuffling and duplicating sample cards
 const createInitialDeck = () => {
-  const deck = [];
-  for (let i = 0; i < 30; i++) {
-    const cardId = `card-${Date.now()}-${i}`;
-    deck.push(createRandomCard(cardId));
-  }
-  return deck;
+  const shuffled = [...sampleCards].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 5); // Start with 5 cards
 };
 
 const initialState = {
@@ -16,7 +25,7 @@ const initialState = {
     id: 'player1',
     name: 'Player 1',
     health: 20,
-    deck: [],
+    deck: createInitialDeck(),
     hand: [],
     field: []
   },
@@ -24,16 +33,14 @@ const initialState = {
     id: 'player2',
     name: 'Player 2',
     health: 20,
-    deck: [],
+    deck: createInitialDeck(),
     hand: [],
     field: []
   },
   currentTurn: 'player1',
   turnNumber: 0,
   isGameOver: false,
-  winner: null,
-  lastPlayedCard: null,
-  isGameStarted: false
+  winner: null
 };
 
 /**
@@ -43,34 +50,27 @@ const initialState = {
  */
 function battleReducer(state, action) {
   switch (action.type) {
-    case 'START_GAME': {
-      // Create initial hands with 7 cards each
-      const player1Hand = Array.from({ length: 7 }, () => createRandomCard());
-      const player2Hand = Array.from({ length: 7 }, () => createRandomCard());
-      
+    case 'START_GAME':
       return {
         ...state,
         turnNumber: 1,
         isGameOver: false,
         winner: null,
-        isGameStarted: true,
         player1: {
           ...state.player1,
           health: 20,
-          deck: [],
-          hand: player1Hand,
+          deck: createInitialDeck(),
+          hand: [],
           field: []
         },
         player2: {
           ...state.player2,
           health: 20,
-          deck: [],
-          hand: player2Hand,
+          deck: createInitialDeck(),
+          hand: [],
           field: []
-        },
-        lastPlayedCard: null
+        }
       };
-    }
     
     case 'PLAY_CARD': {
       const player = state[action.playerId];
@@ -80,13 +80,8 @@ function battleReducer(state, action) {
       
       const newHand = [...player.hand];
       const [card] = newHand.splice(cardIndex, 1);
-      
-      // Check if the card can be played (UNO rules)
-      if (state.lastPlayedCard && 
-          card.attack !== state.lastPlayedCard.attack && 
-          card.defense !== state.lastPlayedCard.defense) {
-        return state;
-      }
+      const newField = [...player.field];
+      newField.splice(action.position, 0, card);
       
       // Check for game over after playing a card
       const updatedState = {
@@ -94,91 +89,101 @@ function battleReducer(state, action) {
         [action.playerId]: {
           ...player,
           hand: newHand,
-          field: [...player.field, card]
-        },
-        lastPlayedCard: card
+          field: newField
+        }
       };
-      
-      // If player has no cards left, they win
-      if (newHand.length === 0) {
-        return {
-          ...updatedState,
-          isGameOver: true,
-          winner: action.playerId
-        };
-      }
       
       return checkGameOver(updatedState);
     }
     
     case 'END_TURN': {
       const nextPlayer = state.currentTurn === 'player1' ? 'player2' : 'player1';
-      const newTurnNumber = state.currentTurn === 'player1' ? state.turnNumber + 1 : state.turnNumber;
-      
-      return {
+      const updatedState = {
         ...state,
         currentTurn: nextPlayer,
-        turnNumber: newTurnNumber
+        turnNumber: state.turnNumber + 1
       };
+      
+      return checkGameOver(updatedState);
     }
     
     case 'DRAW_CARD': {
       const player = state[action.playerId];
       if (player.deck.length === 0) return state;
       
-      const newCard = createRandomCard(`card-${Date.now()}`);
-      const updatedDeck = [...player.deck.slice(1)];
-      const updatedHand = [...player.hand, newCard];
+      const newDeck = [...player.deck];
+      const [card] = newDeck.splice(0, 1);
       
-      return {
+      const updatedState = {
         ...state,
         [action.playerId]: {
           ...player,
-          deck: updatedDeck,
-          hand: updatedHand
+          deck: newDeck,
+          hand: [...player.hand, card]
         }
       };
+      
+      return checkGameOver(updatedState);
     }
     
     case 'ATTACK': {
-      const { attackerId, defenderId, attackerCardId, defenderCardId, diceWinner } = action;
+      const { attackerId, defenderId, attackerCardId, defenderCardId } = action;
+      
+      // If attacking player directly (no defender card)
+      if (!defenderCardId) {
+        const attacker = state[attackerId];
+        const defender = state[defenderId];
+        const attackerCard = attacker.field.find(card => card.id === attackerCardId);
+        
+        if (!attackerCard) return state;
+        
+        const newDefenderHealth = defender.health - attackerCard.attack;
+        
+        const updatedState = {
+          ...state,
+          [defenderId]: {
+            ...defender,
+            health: newDefenderHealth
+          }
+        };
+        
+        return checkGameOver(updatedState);
+      }
+      
+      // Card vs card combat
       const attacker = state[attackerId];
       const defender = state[defenderId];
-      
       const attackerCard = attacker.field.find(card => card.id === attackerCardId);
       const defenderCard = defender.field.find(card => card.id === defenderCardId);
       
       if (!attackerCard || !defenderCard) return state;
       
-      // Determine damage based on dice roll winner
-      let damage = 0;
-      if (diceWinner === attackerId) {
-        // Attacker wins dice roll - full damage
-        damage = Math.max(0, attackerCard.attack - defenderCard.defense);
-      } else if (diceWinner === defenderId) {
-        // Defender wins dice roll - half damage
-        damage = Math.max(0, Math.floor((attackerCard.attack - defenderCard.defense) / 2));
-      } else {
-        // Draw - quarter damage
-        damage = Math.max(0, Math.floor((attackerCard.attack - defenderCard.defense) / 4));
-      }
+      // Apply damage to both cards
+      const newAttackerField = attacker.field.map(card => 
+        card.id === attackerCardId 
+          ? { ...card, defense: card.defense - defenderCard.attack } 
+          : card
+      ).filter(card => card.defense > 0);
       
-      // Apply damage to defender's health
-      const newDefenderHealth = Math.max(0, defender.health - damage);
+      const newDefenderField = defender.field.map(card => 
+        card.id === defenderCardId 
+          ? { ...card, defense: card.defense - attackerCard.attack } 
+          : card
+      ).filter(card => card.defense > 0);
       
-      // Check if game is over
-      const isGameOver = newDefenderHealth === 0;
-      const winner = isGameOver ? attackerId : null;
-      
-      return {
+      const updatedState = {
         ...state,
+        [attackerId]: {
+          ...attacker,
+          field: newAttackerField
+        },
         [defenderId]: {
           ...defender,
-          health: newDefenderHealth
-        },
-        isGameOver,
-        winner
+          field: newDefenderField
+        }
       };
+      
+      return checkGameOver(updatedState);
     }
     
     default:

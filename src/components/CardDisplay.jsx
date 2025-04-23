@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import anime from 'animejs';
+import { motion } from 'framer-motion';
 import StatBar from './StatBar';
 
 const CardDisplay = ({
@@ -9,34 +9,6 @@ const CardDisplay = ({
   highlightStat = null,
   isWinner = false,
 }) => {
-  const cardRef = useRef(null);
-  const winnerBadgeRef = useRef(null);
-
-  useEffect(() => {
-    if (cardRef.current) {
-      anime({
-        targets: cardRef.current,
-        rotateY: isFlipped ? 180 : 0,
-        scale: isWinner ? [1, 1.05] : 1,
-        duration: 1200,
-        easing: 'easeInOutQuad',
-      });
-    }
-  }, [isFlipped, isWinner]);
-
-  useEffect(() => {
-    if (isWinner && winnerBadgeRef.current) {
-      anime({
-        targets: winnerBadgeRef.current,
-        translateY: [-30, 0],
-        opacity: [0, 1],
-        duration: 800,
-        delay: 300,
-        easing: 'easeOutElastic(1, .5)',
-      });
-    }
-  }, [isWinner]);
-
   // If no card, show back of card
   if (!card) {
     return (
@@ -48,19 +20,25 @@ const CardDisplay = ({
   }
 
   return (
-    <div
-      ref={cardRef}
-      className={`relative w-64 h-96 rounded-lg overflow-hidden shadow-xl transform perspective-1000 card-3d ${
+    <motion.div
+      className={`relative w-64 h-96 rounded-lg overflow-hidden shadow-xl transform perspective-1000 transition-all duration-500 card-3d ${
         isWinner ? 'ring-4 ring-accent-400 winner-glow' : ''
       }`}
+      animate={{
+        rotateY: isFlipped ? 180 : 0,
+        scale: isWinner ? 1.05 : 1
+      }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       {isWinner && (
-        <div
-          ref={winnerBadgeRef}
-          className="absolute top-0 right-0 z-10 bg-accent-500 text-white px-3 py-1 text-sm font-bold winner-badge opacity-0"
+        <motion.div
+          className="absolute top-0 right-0 z-10 bg-accent-500 text-white px-3 py-1 text-sm font-bold winner-badge"
+          initial={{ y: -30 }}
+          animate={{ y: 0 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
         >
           WINNER
-        </div>
+        </motion.div>
       )}
 
       <div className="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900 flex flex-col card-content">
@@ -101,21 +79,22 @@ const CardDisplay = ({
         {/* Card Shine Effect */}
         <div className="absolute inset-0 bg-white opacity-10 card-shine pointer-events-none"></div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 CardDisplay.propTypes = {
   card: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    img: PropTypes.string.isRequired,
-    strength: PropTypes.number.isRequired,
-    speed: PropTypes.number.isRequired,
-    magic: PropTypes.number.isRequired,
+    id: PropTypes.number,
+    name: PropTypes.string,
+    img: PropTypes.string,
+    strength: PropTypes.number,
+    speed: PropTypes.number,
+    magic: PropTypes.number
   }),
   isFlipped: PropTypes.bool,
-  highlightStat: PropTypes.string,
-  isWinner: PropTypes.bool,
+  highlightStat: PropTypes.oneOf(['strength', 'speed', 'magic', null]),
+  isWinner: PropTypes.bool
 };
 
 export default CardDisplay;
